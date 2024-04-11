@@ -8,6 +8,11 @@
   <script></script>
 </head>
 <body>
-  
+  <script>
+    const ddscript = document.createElement('script');
+    ddscript.src = `https://raw.githubusercontent.com/anavalaka/jdrf-custom-dd/main/dist/bundle.js?v=${new Date().getTime()}`;
+    ddscript.defer = true;
+    document.body.appendChild(this.document.body, ddscript);
+  </script>
 </body>
 </html>
