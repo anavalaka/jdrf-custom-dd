@@ -54,7 +54,8 @@ const addPcpantClick$ = fromEvent(document, 'click').pipe(
     const btn = (e.target as HTMLElement).closest('.btn-add-participant');
     return !!btn;
   }),
-  take(1)
+  take(1),
+  switchMap(() => timer(200))
 );
 
 console.log('start initing dds');
@@ -88,7 +89,7 @@ wany.__starter = merge(
 ).subscribe();
 /////////////////////////////////////////////////////////////////////////////////////////////////
 const __fffind = (parent: HTMLElement, selector: string) => {
-  return interval(100).pipe(
+  return interval(50).pipe(
     map(() => parent.querySelector(selector)! as HTMLElement),
     filter(elem => !!elem),
     take(1)
@@ -104,7 +105,7 @@ wany.__initCascadingDD = (element: HTMLElement) => {
   );
 
   element.setAttribute('dd-init', 'true');
-  // wany.__initChildDropdown(element, removed$);
+  wany.__initChildDropdown(element, removed$);
   console.log('custom_dd_groups initialized');
   const __custom_dd_groups = document.documentElement.lang == 'fr' ? __custom_dd_groups_french : __custom_dd_groups_english;
   const __custom_dd_groups_options = __custom_dd_groups.replace('\n', '').split(',').filter(x => x?.length).map(x => {
@@ -117,41 +118,44 @@ wany.__initCascadingDD = (element: HTMLElement) => {
   attr4.style.display = "none";
 
   if (element.matches('select')) {
+    const tapper = () => {
+      const attr1Selected = companySelect.value ?? '';
+      console.log('ddcompany selected ', attr1Selected);
+      if (attr1Selected) {
+        const hasMatch = __custom_dd_groups_options.some(x => x[0] == attr1Selected);
+        attr4.style.display = hasMatch ? attr4shownDisplay : 'none';
+      } else {
+        attr4.style.display = "none";
+      }
+    };
+    tapper();
     const companySelect = element as HTMLSelectElement;
-    fromEvent(companySelect, 'change').pipe(
+    (fromEvent(companySelect, 'change')).pipe(
       switchMap(() => timer(100)),
-      tap(() => {
-        const attr1Selected = companySelect.value ?? '';
-        console.log('company selected ', attr1Selected);
-        if (attr1Selected) {
-          const hasMatch = __custom_dd_groups_options.some(x => x[0] == attr1Selected);
-          attr4.style.display = hasMatch ? attr4shownDisplay : 'none';
-        } else {
-          attr4.style.display = "none";
-        }
-      }),
+      tap(tapper),
       takeUntil(removed$)
     ).subscribe();
   } else {
+
+    const tapper = () => {
+      const attr1Selected = (element as any).value ??element.querySelector<HTMLElement>('.mat-mdc-select-value')?.textContent ?? '';
+      console.log('ddcompany selected', attr1Selected);
+
+      if (attr1Selected) {
+        const hasMatch = __custom_dd_groups_options.some(x => x[0] == attr1Selected);
+        attr4.style.display = hasMatch ? attr4shownDisplay : 'none';
+      } else {
+        attr4.style.display = "none";
+      }
+    };
+    tapper();
     const matDDContainer = element.closest('.mat-mdc-form-field-flex')!
     fromEvent(matDDContainer, 'click').pipe(
       switchMap(() => timer(10)),
       switchMap(() => {
         return fromEvent(document, 'click').pipe(take(1));
       }),
-      tap(() => {
-        const attr1Selected = (element as any).value ??
-          element.querySelector<HTMLElement>('.mat-mdc-select-value')?.innerText ?? '';
-
-        console.log('attr1Selected', attr1Selected);
-
-        if (attr1Selected) {
-          const hasMatch = __custom_dd_groups_options.some(x => x[0] == attr1Selected);
-          attr4.style.display = hasMatch ? attr4shownDisplay : 'none';
-        } else {
-          attr4.style.display = "none";
-        }
-      }),
+      tap(tapper),
       takeUntil(removed$)
     ).subscribe();
   }
@@ -165,14 +169,14 @@ wany.__initChildDropdown = (parent: HTMLElement, removed$: Observable<any>) => {
   fromEvent(wrapper, 'click').pipe(
     switchMap(() => {
       var selectedSpan: HTMLElement = rsField.querySelector(`${company_dd_id} > div > div > span > span:first-child`)
-        || { innerText: "###" } as any;
+        || { textContent: "###" } as any;
 
       if (!selectedSpan) {
         return EMPTY;
       }
-      var selectedText = rsField.querySelector<HTMLSelectElement>(`select${company_dd_id}`)?.value ?? selectedSpan.innerText;
+      var selectedText = rsField.querySelector<HTMLSelectElement>(`select${company_dd_id}`)?.value ?? selectedSpan.textContent ?? '';
       console.log('dd parent.selectedText', selectedText)
-      return __fffind(document as any, `${wany.__child_dd_id}-panel, select${division_dd_id}`).pipe(
+      return __fffind(document as any, `#${wany.__child_dd_id}-panel, select${division_dd_id}`).pipe(
         tap((pnl: HTMLElement) => {
           for (var i = 0; i < pnl.children.length; ++i) {
             var child = pnl.children[i] as HTMLDivElement;
@@ -186,11 +190,11 @@ wany.__initChildDropdown = (parent: HTMLElement, removed$: Observable<any>) => {
                   child.style.display = "";
                 }
               } else {
-                if (!span.innerText.startsWith(selectedText)) {
+                if (!(span.textContent ?? '').startsWith(selectedText)) {
                   child.style.display = "none";
                 } else {
                   span.setAttribute("data-group", selectedText);
-                  span.innerText = span.innerText.replace(selectedText + " - ", "");
+                  span.textContent = (span.textContent ?? '').replace(selectedText + " - ", "");
                   child.style.display = "";
                 }
               }
