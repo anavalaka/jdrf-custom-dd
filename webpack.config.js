@@ -19,4 +19,6 @@ module.exports = {
       },
     ],
   },
+  // Add the devtool option
+  devtool: 'source-map',
 };
