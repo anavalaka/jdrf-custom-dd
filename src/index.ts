@@ -1,4 +1,5 @@
 
+import { EMPTY, Observable, catchError } from 'rxjs';
 import { fromEvent } from 'rxjs/internal/observable/fromEvent';
 import { interval } from 'rxjs/internal/observable/interval';
 import { merge } from 'rxjs/internal/observable/merge';
@@ -56,25 +57,38 @@ const addPcpantClick$ = fromEvent(document, 'click').pipe(
   take(1)
 );
 
-merge([
+console.log('start initing dds');
+
+const catchIt = () => {
+  return (source:Observable<any>) => source.pipe(
+    catchError(err => {
+      console.error('init dd error:', err);
+      return EMPTY;
+    })
+  );
+};
+
+wany.__starter = merge(
   addPcpantClick$,
   interval(500)
-]).pipe(
+).pipe(
   map(() => {
     const ddCompanyNotInit = document.querySelectorAll(`${company_dd_id}:not([dd-init])`) ?? [];
-
+    ddCompanyNotInit.length && console.log('ddCompanyNotInit', ddCompanyNotInit);
     for (let index = 0; index < ddCompanyNotInit.length; index++) {
       const element = ddCompanyNotInit[index];
       const rsField = element.closest('rs-field');
       if (rsField?.querySelector(division_dd_id) &&
         rsField?.querySelector(division_dd_id)?.closest('rs-field-input')) {
-        initCascadingDD(element as any);
+        console.log('init this dd', element);
+        wany.__initCascadingDD(element as any);
       }
     }
   })
-)
+).subscribe();
 
-const initCascadingDD = (element: HTMLElement) => {
+wany.__initCascadingDD = (element: HTMLElement) => {
+  
   const removed$ = interval(1000).pipe(
     map(() => !document.contains(element)),
     filter(removed => removed),
