@@ -20,11 +20,11 @@ wany.__custom_dd_groups_french = `Abbott - Diabetes Care,Abbott - Nutrition,AGF 
 wany.__parent_dd_id = 'attribute1';
 wany.__child_dd_id = 'attribute4';
 */
-const __custom_dd_groups_english: string = wany.__custom_dd_groups_english.trim();
-const __custom_dd_groups_french: string = wany.__custom_dd_groups_french.trim();
+let __custom_dd_groups_english: string = '';
+let __custom_dd_groups_french: string = '';
 
-const company_dd_id: string = `[id=${wany.__parent_dd_id}]`;
-const division_dd_id: string = `[id=${wany.__child_dd_id}]`;
+let company_dd_id: string = ``;
+let division_dd_id: string = ``;
 
 
 const dd_splitter = (inputString = '') => {
@@ -86,7 +86,24 @@ wany.__starter = merge(
       }
     }
   })
+);
+
+interval(100).pipe(
+  map(() => {
+    __custom_dd_groups_english = wany.__custom_dd_groups_english?.trim();
+    __custom_dd_groups_french = wany.__custom_dd_groups_french?.trim();
+    
+    company_dd_id = `[id=${wany.__parent_dd_id}]`;
+    division_dd_id = `[id=${wany.__child_dd_id}]`;
+
+    return !!__custom_dd_groups_english && !!__custom_dd_groups_french
+      && !!wany.__parent_dd_id && !!wany.__child_dd_id
+  }),
+  filter(x => x),
+  take(1),
+  switchMap(() => wany.__starter)
 ).subscribe();
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 const __fffind = (parent: HTMLElement, selector: string) => {
   return interval(50).pipe(
