@@ -23,7 +23,7 @@ const __custom_dd_groups_english: string = wany.__custom_dd_groups_english.trim(
 const __custom_dd_groups_french: string = wany.__custom_dd_groups_french.trim();
 
 const company_dd_id: string = wany.__company_dd_id;
-const division_dd_id: string = wany.division_dd_id;
+const division_dd_id: string = wany.__division_dd_id;
 */
 
 const dd_splitter = (inputString = '') => {
