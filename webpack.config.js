@@ -4,7 +4,7 @@ module.exports = {
   mode: 'production',
   entry: './src/index.ts',
   output: {
-    filename: 'bundle.js',
+    filename: 'tim-cascade-dropdown.bundle.js',
     path: path.resolve(__dirname, 'dist'),
   },
   resolve: {
