@@ -1,4 +1,5 @@
 const path = require('path');
+var webpack = require("webpack");
 
 module.exports = {
   mode: 'production',
@@ -7,6 +8,12 @@ module.exports = {
     filename: 'tim-cascade-dropdown.bundle.js',
     path: path.resolve(__dirname, 'dist'),
   },
+  plugins: [
+    new webpack.SourceMapDevToolPlugin({
+        filename: "[file].map",
+        sourceRoot: "../"
+    })
+  ],  
   resolve: {
     extensions: ['.ts', '.js'],
   },
@@ -18,7 +25,5 @@ module.exports = {
         exclude: /node_modules/,
       },
     ],
-  },
-  // Add the devtool option
-  devtool: 'source-map',
+  }
 };
