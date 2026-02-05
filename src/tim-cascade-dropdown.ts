@@ -154,7 +154,8 @@ wany.__initCascadingDD = (element: HTMLElement) => {
     ).subscribe();
   } else {
 
-    const tapper = () => {
+    const tapper = async () => {
+      await createAwait(10);
       const attr1Selected = (element as any).value ??element.querySelector<HTMLElement>('.mat-mdc-select-value')?.textContent ?? '';
       console.log('ddcompany selected', attr1Selected);
 
@@ -223,3 +224,7 @@ wany.__initChildDropdown = (parent: HTMLElement, removed$: Observable<any>) => {
     takeUntil(removed$)
   ).subscribe();
 };
+
+async function createAwait(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
