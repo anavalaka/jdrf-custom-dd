@@ -1,4 +1,5 @@
 
+import { delay } from 'rxjs';
 import { Observable } from 'rxjs/internal/Observable';
 import { EMPTY } from 'rxjs/internal/observable/empty';
 import { fromEvent } from 'rxjs/internal/observable/fromEvent';
@@ -155,7 +156,6 @@ wany.__initCascadingDD = (element: HTMLElement) => {
   } else {
 
     const tapper = async () => {
-      await createAwait(10);
       const attr1Selected = (element as any).value ??element.querySelector<HTMLElement>('.mat-mdc-select-value')?.textContent ?? '';
       console.log('ddcompany selected', attr1Selected);
 
@@ -173,6 +173,7 @@ wany.__initCascadingDD = (element: HTMLElement) => {
       switchMap(() => {
         return fromEvent(document, 'click').pipe(take(1));
       }),
+      delay(100),
       tap(tapper),
       takeUntil(removed$)
     ).subscribe();
@@ -224,7 +225,3 @@ wany.__initChildDropdown = (parent: HTMLElement, removed$: Observable<any>) => {
     takeUntil(removed$)
   ).subscribe();
 };
-
-async function createAwait(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
